@@ -1,73 +1,48 @@
-// console.log("welcome node js");
-// alert("jdsflahgfslaj");
-// document.write("hs,ajhl,kjshd")
+//Import express module
+const express=require('express');
+const app=express();
 
+app.use(express.json());//middleware to parse JSON data
 
-// let dis=require('./app')
-// console.log(dis(10,20));
+//sample user data
+let users=[
+{
+    id:1,name:"alice",email:"sasi@gmail.com"},
+    {id:2,name:"rose",email:"kiru@gamil.com"}
 
-// let dis=require('./app')
-// console.log(dis.add(10,20));
-// console.log(dis.sub(10,20));
+];
 
-                                                                                       
-// const fs=require('fs')
-// //read file
+//GET all users
+app.get('/users',(req,res)=>{
+    res.json(users);//Fixed from res.join(usres) to res.json(users)
+});
 
-// fs.readFile('kle.txt',(err,data)=>{
-//     if(err)
-// {
-//     console.error('error reading file',err);
-//     return
-// }
-// console.log('File written successfully!');
-// })
+//POST - Add a new user
+app.post('/users',(req,res)=>{
+    const newUser={id: users.length+1, ...req.body};
+    users.push(newUser);
+    res.status(201).json(newUser);//Added response after adding a
+});
 
-// //write
-// fs.writeFile('kle.txt','Hello world!',(err)=>{
-//     if(err){
-//         console.error('err reading file',err);
-//         return
-//     }
-//     console.log('File written successfully!');
-// });
+//PUT - Update a user
+app.put('/users/:id',(req,res)=>{
+    const user=users.find(u=>u.id===parseInt(req.params.id));
+    if(!user)return res.status(404).json({message:"User not found"});
 
-// //update--->append
-// fs.appendFile('kle.txt','\nAppended text!',(err)=>{
-//     if(err){
-//         console.error('error appending in file',err);
-//         return
-//     }
-//     console.error('data appended successfully');
+        user.name=req.body.name || user.name; //fixed incorrect property reference
+        user.email=req.body.email || user.email; //fixed incorrect property refernece
 
-// })
+        res.json(user); //Fixed from res.join(user) to res.json(user)
 
-// //delet-->unlink
-// fs.unlink('kl.txt',(err)=>{
+});
 
-// })
-// const path=require('path')
-// const file=path.resolve('node','kle.text')
-// console.log(file);
+//DELET - Remove a user
+app.delete('/users/:id',(req,res)=>{
+    //const userExist= users.some(user =>user.id=== parseInt(req.params)
+    //if (!userExists) return res.status(404).json({message:"user"})
 
-let http=require('http') //import http
-
-http.createServer(function(req,res){
-   
-    if(req.url=='/home')
-    {
-        res.write('home')
-    }
-    else if(req.url=='/about')
-    {
-        res.write('hgfskjhgf;jka;kjhflsa')
-    }
-    else{
-        res.write('undefined')
-    }
-    res.end()
-
-})
-.listen(7000,()=>console.log('server is running in the port'))
-
-
+    users=users.filter(user=>user.id !== parseInt(req.params.id))
+    res.json({message:'User Deleted'});
+});
+//start the server
+app.listen(8000,()=>console.log("Server is running on port 8000"))
